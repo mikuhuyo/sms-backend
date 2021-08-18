@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mapper.ReceiveLogMapper">
+
+    <resultMap type="com.sms.entity.ReceiveLogEntity" id="manualProcessMap">
+        <result column="id" property="id"/>
+        <result column="platform_id" property="platformId"/>
+        <result column="platform_name" property="platformName"/>
+        <result column="business" property="business"/>
+        <result column="config_ids" property="configIds"/>
+        <result column="template" property="template"/>
+        <result column="signature" property="signature"/>
+        <result column="mobile" property="mobile"/>
+        <result column="request" property="request"/>
+        <result column="error" property="error"/>
+        <result column="use_time" property="useTime"/>
+        <result column="status" property="status"/>
+        <result property="apiLogId" column="api_log_id"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_delete" property="isDelete"/>
+    </resultMap>
+    <select id="selectLogPage" resultType="com.sms.vo.ReceiveLogVO">
+        select rl.*,sl.config_name,s.name as signature_name,t.name as template_name from receive_log rl
+        left join send_log sl on rl.api_log_id = sl.api_log_id
+        left join signature s on rl.signature = s.code
+        left join template t on rl.template = t.code
+        <where>
+            1 = 1
+            <if test="params.signatureName != null">
+                AND s.name LIKE concat('%',#{params.signatureName},'%')
+            </if>
+            <if test="params.templateName != null">
+                AND t.name LIKE concat('%',#{params.templateName},'%')
+            </if>
+            <if test="params.platformName != null">
+                AND rl.platform_name LIKE concat('%',#{params.platformName},'%')
+            </if>
+            <if test="params.configName != null">
+                AND sl.config_name LIKE concat('%',#{params.configName},'%')
+            </if>
+            <if test="params.startCreateTime != null">
+                and rl.create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and rl.create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        order by rl.create_time desc
+    </select>
+    <select id="top10" resultType="com.sms.vo.StatisticsCountVO">
+        SELECT
+        platform_name as date,
+        COUNT( * ) AS count,
+        SUM( STATUS ) AS success
+        FROM
+        receive_log
+        <where>
+            1 = 1
+            <if test="params.startCreateTime != null">
+                and create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        GROUP BY
+        platform_name
+        ORDER BY count DESC
+        limit 10
+    </select>
+    <select id="trend" resultType="com.sms.vo.StatisticsCountVO">
+        SELECT
+        DATE_FORMAT( create_time, '%c.%e' ) AS date,
+        COUNT( * ) AS count,
+        SUM(status) as success
+        FROM
+        receive_log
+        <where>
+            1 = 1
+            <if test="params.platformId != null">
+                and platform_id = #{params.platformId}
+            </if>
+            <if test="params.startCreateTime != null">
+                and create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        GROUP BY date
+        ORDER BY date DESC
+    </select>
+
+
+</mapper>

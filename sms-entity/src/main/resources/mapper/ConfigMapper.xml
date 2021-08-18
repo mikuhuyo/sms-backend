@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mapper.ConfigMapper">
+
+    <resultMap type="com.sms.entity.ConfigEntity" id="configMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="platform" column="platform"/>
+        <result property="domain" column="domain"/>
+        <result property="accessKeyId" column="access_key_id"/>
+        <result property="accessKeySecret" column="access_key_secret"/>
+        <result property="other" column="other"/>
+        <result property="isActive" column="is_active"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="remark" column="remark"/>
+        <result property="level" column="level"/>
+        <result property="channelType" column="channel_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+    <select id="findByTemplateSignature" parameterType="java.util.Map" resultMap="configMap">
+        select c.*
+        from config c
+                 left join config_template ct on c.id = ct.config_id
+                 left join config_signature cs on c.id = cs.config_id
+        where c.is_active = 1
+          and c.is_enable = 1
+          and c.is_delete = 1
+          and ct.template_id = #{template}
+          and cs.signature_id = #{signature}
+        order by c.level asc
+    </select>
+
+</mapper>

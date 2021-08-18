@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mapper.SendLogMapper">
+
+    <resultMap type="com.sms.entity.SendLogEntity" id="sendLogMap">
+        <result property="id" column="id"/>
+        <result property="configId" column="config_id"/>
+        <result property="configPlatform" column="config_platform"/>
+        <result property="configName" column="config_name"/>
+        <result property="template" column="template_id"/>
+        <result property="signature" column="signature_id"/>
+        <result property="mobile" column="mobile"/>
+        <result property="request" column="request"/>
+        <result property="response" column="response"/>
+        <result property="error" column="error"/>
+        <result property="useTime" column="use_time"/>
+        <result property="status" column="status"/>
+        <result property="apiLogId" column="api_log_id"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+    <select id="selectLogPage" resultType="com.sms.vo.SendLogVO">
+        select sl.*,s.name as signature_name,t.name as template_name,rl.platform_name from send_log sl
+        left join receive_log rl on sl.api_log_id = rl.api_log_id
+        left join signature s on sl.signature = s.code
+        left join template t on sl.template = t.code
+        <where>
+            1 = 1
+            <if test="params.mobile != null">
+                AND sl.mobile LIKE concat('%',#{params.mobile},'%')
+            </if>
+            <if test="params.signatureName != null">
+                AND s.name LIKE concat('%',#{params.signatureName},'%')
+            </if>
+            <if test="params.templateName != null">
+                AND t.name LIKE concat('%',#{params.templateName},'%')
+            </if>
+            <if test="params.platformName != null">
+                AND rl.platform_name LIKE concat('%',#{params.platformName},'%')
+            </if>
+            <if test="params.startCreateTime != null">
+                and sl.create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and sl.create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        ORDER BY sl.create_time DESC
+    </select>
+    <select id="trend" resultType="com.sms.vo.StatisticsCountVO">
+        SELECT
+        DATE_FORMAT( create_time, '%c.%e' ) AS date,
+        COUNT( * ) AS count,
+        SUM(status) as success
+        FROM
+        send_log
+        <where>
+            1 = 1
+            <if test="params.startCreateTime != null">
+                and create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        GROUP BY date
+        ORDER BY date ASC
+    </select>
+    <select id="countPage" resultType="com.sms.vo.StatisticsCountVO">
+        SELECT
+        DATE_FORMAT(sl.create_time, '%Y-%m-%d' ) AS date,
+        COUNT( * ) AS count,
+        SUM(sl.status) as success
+        FROM
+        send_log sl
+        left join signature s on sl.signature = s.code
+        <where>
+            1 = 1
+            <if test="params.startCreateTime != null">
+                and sl.create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and sl.create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.configPlatform != null">
+                and sl.config_platform = #{params.configPlatform}
+            </if>
+            <if test="params.signatureName != null">
+                AND s.name LIKE concat('%',#{params.signatureName},'%')
+            </if>
+        </where>
+        GROUP BY date
+        ORDER BY date ASC
+    </select>
+    <select id="countForConfig" resultType="java.util.Map">
+        SELECT
+        config_name as name,
+        COUNT( * ) AS count ,
+        SUM( STATUS ) AS value
+        FROM
+        send_log
+        <where>
+            config_id != 404
+            <if test="params.startCreateTime != null">
+                and create_time >= DATE_FORMAT(#{params.startCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+            <if test="params.endCreateTime != null">
+                and create_time <![CDATA[ <= ]]> DATE_FORMAT(#{params.endCreateTime}, '%Y-%m-%d %H:%i:%S' )
+            </if>
+        </where>
+        GROUP BY
+        config_name
+        ORDER BY
+        config_name ASC
+    </select>
+    <select id="getMarketingCount" resultType="com.sms.vo.MarketingStatisticsCountVO">
+        SELECT COUNT(*)       AS count,
+               SUM(sl.STATUS) AS success,
+               MAX(s.NAME)    AS signature_name
+        FROM send_log sl
+                 LEFT JOIN receive_log rl ON sl.api_log_id = rl.api_log_id
+                 LEFT JOIN signature s ON sl.signature = s.CODE
+        WHERE rl.business = #{params.business}
+    </select>
+    <select id="sendLogPage" resultType="com.sms.vo.SendLogPageVO">
+        SELECT
+        sl.mobile,
+        sl.create_time,
+        s.NAME AS signature_name,
+        t.type AS template_type,
+        t.NAME AS template_name,
+        t.content AS template_content,
+        sl.STATUS,
+        rl.platform_name,
+        rl.request,
+        sl.response,
+        sl.error,
+        sl.config_platform
+        FROM
+        send_log sl
+        LEFT JOIN receive_log rl ON sl.api_log_id = rl.api_log_id
+        LEFT JOIN signature s ON sl.signature = s.CODE
+        LEFT JOIN template t ON sl.template = t.CODE
+        <where>
+            1 = 1
+            <if test="params.date != null">
+                AND sl.create_time >= DATE_FORMAT(concat(#{params.date},' 00:00:00'), '%Y-%m-%d %H:%i:%S' )
+                AND sl.create_time <![CDATA[ <= ]]> DATE_FORMAT(concat(#{params.date},' 23:59:59'), '%Y-%m-%d %H:%i:%S')
+            </if>
+            <if test="params.mobile != null">
+                AND sl.mobile LIKE concat('%',#{params.mobile},'%')
+            </if>
+            <if test="params.status != null">
+                AND sl.STATUS = #{params.status}
+            </if>
+            <if test="params.signatureName != null ">
+                AND s.name LIKE concat('%',#{params.signatureName},'%')
+            </if>
+            <if test="params.templateType != null">
+                AND t.type = #{params.templateType}
+            </if>
+            <if test="params.templateName != null">
+                AND t.name = #{params.templateName}
+            </if>
+            <if test="params.platformName != null">
+                AND rl.platform_name = #{params.platformName}
+            </if>
+            <if test="params.marketingId != null">
+                AND rl.business = #{params.marketingId}
+            </if>
+        </where>
+        ORDER BY sl.create_time DESC
+    </select>
+
+</mapper>

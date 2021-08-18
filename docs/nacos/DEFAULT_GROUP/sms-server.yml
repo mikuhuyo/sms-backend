@@ -1,0 +1,49 @@
+pd:
+  mysql:
+    database: sms
+  swagger:
+    enabled: true
+    docket:
+      info:
+        title: 短信发送服务
+        base-package: com.sms.server.controller
+  sms:
+    messageErrorNum: 3
+    configLevelFailNum: 10
+    configBuildScale: 0.75
+
+authentication:
+  user:
+    header-name: token
+    # 外部token有效期为12小时
+    expire: 43200
+    # 加密
+    pri-key: client/pri.key
+    # 解密
+    pub-key: client/pub.key
+
+server:
+  port: 8772
+
+spring:
+  cache:
+    type: REDIS
+  redis:
+    database: 1
+    password: yueliminvc@outlook.com
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 200
+        max-idle: 20
+        min-idle: 3
+        max-wait: -1ms
+    sentinel:
+      master: mymaster
+      nodes:
+        - 192.168.158.160:26379
+        - 192.168.158.160:26380
+        - 192.168.158.160:26381
+    queue:
+      pop:
+        timeout: 8000

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mapper.SignatureMapper">
+
+    <resultMap type="com.sms.entity.SignatureEntity" id="signatureMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="content" column="content"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+    <select id="custom" resultType="com.sms.dto.SignatureDTO">
+        select s.*,cs.config_signature_code,cs.config_id from config_signature cs
+        left join signature s on cs.signature_id = s.id
+        <where>
+            s.is_delete = 1 and cs.is_delete = 1
+            <if test="params.name != null">
+                AND s.name LIKE concat('%',#{params.name},'%')
+            </if>
+            <if test="params.code != null">
+                AND s.code LIKE concat('%',#{params.code},'%')
+            </if>
+            <if test="params.configId != null">
+                AND cs.config_id = #{params.configId}
+            </if>
+        </where>
+        order by s.create_time desc
+    </select>
+
+</mapper>

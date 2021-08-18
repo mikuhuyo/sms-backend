@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mapper.ConfigTemplateMapper">
+
+    <resultMap type="com.sms.entity.ConfigTemplateEntity" id="configTemplateMap">
+        <result property="id" column="id"/>
+        <result property="configId" column="config_id"/>
+        <result property="templateId" column="template_id"/>
+        <result property="configTemplateCode" column="config_template_code"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+</mapper>

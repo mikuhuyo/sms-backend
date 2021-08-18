@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sms</groupId>
+    <artifactId>sms-backend</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>sms-api</module>
+        <module>sms-manage</module>
+        <module>sms-server</module>
+        <module>sms-sdk</module>
+        <module>sms-entity</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.2.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <profiles>
+        <!-- 开发环境 -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <pom.profile.name>dev</pom.profile.name>
+                <pom.nacos.ip>192.168.158.160</pom.nacos.ip>
+                <pom.nacos.port>8848</pom.nacos.port>
+                <pom.nacos.namespace>5c887121-8fca-4600-a937-e589b1c4172c</pom.nacos.namespace>
+            </properties>
+        </profile>
+
+        <!-- 测试环境 -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <pom.profile.name>test</pom.profile.name>
+                <pom.nacos.ip>192.168.158.160</pom.nacos.ip>
+                <pom.nacos.port>8848</pom.nacos.port>
+                <pom.nacos.namespace>5c887121-8fca-4600-a937-e589b1c4172c</pom.nacos.namespace>
+            </properties>
+        </profile>
+
+        <!-- 生产环境 -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <pom.profile.name>prod</pom.profile.name>
+                <pom.nacos.ip>192.168.158.160</pom.nacos.ip>
+                <pom.nacos.port>8848</pom.nacos.port>
+                <pom.nacos.namespace>5c887121-8fca-4600-a937-e589b1c4172c</pom.nacos.namespace>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
+        <spring.cloud.version>Hoxton.SR1</spring.cloud.version>
+        <spring.version>5.2.2.RELEASE</spring.version>
+        <spring-cloud-alibaba-dependencies.version>2.1.1.RELEASE</spring-cloud-alibaba-dependencies.version>
+        <maven.plugin.version>3.8.1</maven.plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+
+        <pd.version>1.0-SNAPSHOT</pd.version>
+
+        <mybatis.version>3.5.2</mybatis.version>
+        <mybatis.typehandlers.version>1.0.2</mybatis.typehandlers.version>
+        <mybatisplus.version>3.2.0</mybatisplus.version>
+        <mysql.version>8.0.11</mysql.version>
+        <druid.version>1.1.21</druid.version>
+        <asm.version>5.0.4</asm.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
+        <tobato-fastdfs-client.version>1.26.6</tobato-fastdfs-client.version>
+        <qiniu-java-sdk>7.2.18</qiniu-java-sdk>
+        <springfox.version>2.9.2</springfox.version>
+        <lombok.version>1.18.10</lombok.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <guava.version>20.0</guava.version>
+        <hutool.version>5.1.0</hutool.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
+        <minio.version>6.0.13</minio.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-auth-entity</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+
+            <!-- 从项目中添加依赖 -->
+            <!--
+            <dependency>
+                <groupId>org.openoffice</groupId>
+                <artifactId>jodconverter</artifactId>
+                <version>2.2.2</version>
+                <type>jar</type>
+                <scope>system</scope>
+                <systemPath>${project.basedir}/libs/jodconverter-2.2.2.jar</systemPath>
+            </dependency>
+            -->
+
+            <!-- pd-tools -->
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-common</artifactId>
+                <version>${pd.version}</version>
+                <!--
+                <type>jar</type>
+                <scope>system</scope>
+                <systemPath>${project.basedir}/libs/pd-tools-common-1.0-SNAPSHOT.jar</systemPath>
+                -->
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-core</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-database</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-dozer</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-j2cache</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-jwt</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-log</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-swagger</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-user</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-valid</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pd</groupId>
+                <artifactId>pd-tools-xss</artifactId>
+                <version>${pd.version}</version>
+            </dependency>
+
+            <!-- 持久层相关 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatisplus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus</artifactId>
+                <version>${mybatisplus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-typehandlers-jsr310</artifactId>
+                <version>${mybatis.typehandlers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!-- FastDFS文件 -->
+            <dependency>
+                <groupId>com.github.tobato</groupId>
+                <artifactId>fastdfs-client</artifactId>
+                <version>${tobato-fastdfs-client.version}</version>
+            </dependency>
+
+            <!-- 七牛依赖 -->
+            <dependency>
+                <groupId>com.qiniu</groupId>
+                <artifactId>qiniu-java-sdk</artifactId>
+                <version>${qiniu-java-sdk}</version>
+            </dependency>
+
+            <!-- Minio -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-core</artifactId>
+                <version>${springfox.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.whvcse</groupId>
+                <artifactId>easy-captcha</artifactId>
+                <version>${easy-captcha.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+
+        <!--Lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <!-- resources资源插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <!-- 后缀为pem, pfx的证书文件 -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>key</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+
+            <!-- java文档插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
